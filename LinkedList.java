@@ -86,6 +86,11 @@ public class LinkedList<E> { //<E> means a generic type
 	}
 	
 	public E remove(int i) {
+		if(i == 0) {
+			Node temp = first;
+			first = first.next;
+			return temp.data;
+		}
 		try {
 			Node curr = first;
 			
@@ -119,6 +124,11 @@ public class LinkedList<E> { //<E> means a generic type
 		String s = (String)list.remove(0);
 		System.out.println(s);
 		System.out.println(list.get(1));
+		
+	}
+
+	public void Compare(Card card, Card card2) {
+		// TODO Auto-generated method stub
 		
 	}
 	

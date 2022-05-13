@@ -6,8 +6,9 @@ public class CannibalState{
 	int cannR;
 	int missL;
 	int missR;
+	int depth = 0;
 	boolean boatLeft = true;
-
+	HashSet<CannibalState> previousStates = new HashSet<CannibalState>();
 	public CannibalState(int cannibalL, int cannibalR, int missionaryL, int missionaryR, boolean boatL) {
 		cannL = cannibalL;
 		cannR = cannibalR;
@@ -29,14 +30,33 @@ public class CannibalState{
 		return true;
 	}
 	
-	public boolean isSolved() {
+	public ArrayList<CannibalState> solve(int Depth, HashSet<CannibalState> previous, ArrayList<CannibalState> solution) {
 		if(missL ==0 && cannL ==0) {
-			return true;
+			solution.add(this);
+			return solution;
 		}
-		return false;
+		if(Depth>=10000) {
+			return null;
+		}
+		for(CannibalState z: nextState()) {
+			if(previous.contains(z)) {
+				continue;
+			}
+			else {
+				previous.add(z);
+			}
+			ArrayList<CannibalState> state = z.solve(Depth +1, previous, solution);
+			
+			if(state != null) {
+				solution.add(this);
+				return solution;
+			}
+		}
+		return null;
 	}
 	
-	public int generateHashcode() {
+	public int hashCode() {
+		System.out.println("No hashcode");
 		if(boatLeft) {
 			return 10 * missL + 1000 * cannL + 100000 * missR + 10000000*cannR + 1000000000*1;
 		}
@@ -51,21 +71,35 @@ public class CannibalState{
 	
 	public HashSet<CannibalState> nextState(){
 		HashSet<CannibalState> nextstate = new HashSet<CannibalState>();
+		System.out.println(missL);
+		System.out.println(cannL);
 		for(int i = 0; i < Math.min(2, boatLeft ? missL : missR); i++) {
-			for(int j = (i ==0 ? 1:0); j < Math.min(2-i, boatLeft ? cannL : cannR); j++) {
+			for(int j = (i == 0 ? 1:0); j < Math.min(2-i, boatLeft ? cannL : cannR); j++) {
+				System.out.println(i);
+				System.out.println(j);
 				CannibalState next;
 				if(boatLeft) {
-					next = new CannibalState(missL-i, cannL-j, missR + i, cannR + j, false);
+					next = new CannibalState(cannL-j, cannR + j, missL-i, missR + i,false);
+					System.out.println(next);
 				}
 				else {
-					next = new CannibalState(missL + i, cannL + j, missR -i, cannR -j, true);
+					System.out.println("heee");
+					next = new CannibalState(cannL + j, cannR -j, missL + i, missR -i,true);
 				}
 				if(next.isLegal()) {
 					nextstate.add(next);
 				}
 			}
 		}
+		System.out.println(nextstate.size());
 		return nextstate;
+	}
+	
+	public static void main(String[] args) {
+		CannibalState runner = new CannibalState(3,0,3, 0, true);
+		HashSet<CannibalState> previous = new HashSet<CannibalState>();
+		ArrayList<CannibalState> solution = new ArrayList<CannibalState>();
+		System.out.println(runner.solve(1, previous, solution));
 	}
 
 }
